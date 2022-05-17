@@ -1,21 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { SocketContext } from "../contexts/SocketContext";
 
-const BandList = ({
-  data,
-  emitirVotarBanda,
-  emitirBorrarBanda,
-  emitirCambioNombre
-}) => {
+const BandList = () => {
   //State
-  const [bands, setbands] = useState(data);
+  const [bands, setBands] = useState([]);
+  const { socket } = useContext(SocketContext);
 
-  //Effects
-  useEffect(() => setbands(data), [data]);
+  useEffect(() => {
+    socket.on("current-bands", (bands) => setBands(bands));
+    return () => socket.off("current-bands");
+  }, [socket]);
+
+  //Helper methods
+  const emitirVotarBanda = (id) => {
+    socket.emit("votar-banda", { id });
+  };
+
+  const emitirBorrarBanda = (id) => {
+    socket.emit("borrar-banda", { id });
+  };
+
+  const emitirCambioNombre = (id, nuevoNombre) => {
+    socket.emit("cambiar-nombre-banda", { id, nuevoNombre });
+  };
 
   // Events methods
   const cambiarNombre = (event, id) => {
     const nuevoNombre = event.target.value;
-    setbands((bands) =>
+    setBands((bands) =>
       bands.map((band) => {
         if (band.id === id) band.name = nuevoNombre;
         return band;
