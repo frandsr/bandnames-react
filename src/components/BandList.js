@@ -1,23 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-const BandList = () => {
+const BandList = ({ data, votar }) => {
+  //State
+  const [bands, setbands] = useState(data);
+
+  //Effects
+  useEffect(() => setbands(data), [data]);
+
+  // Events methods
+  const cambioNombre = (event, id) => {
+    const nuevoNombre = event.target.value;
+    setbands((bands) =>
+      bands.map((band) => {
+        if (band.id === id) band.name = nuevoNombre;
+        return band;
+      })
+    );
+  };
+
+  const onPerdioFoco = (id, nombre) => {};
+
+  //Helper methods
   const crearRows = () => {
-    return (
-      <tr>
+    return bands.map((band) => (
+      <tr key={band.id}>
         <td>
-          <div className="btn btn-primary"> +1</div>
+          <button className="btn btn-primary" onClick={() => votar(band.id)}>
+            {" "}
+            +1
+          </button>
         </td>
         <td>
-          <input type="text" className="form-control" />
+          <input
+            type="text"
+            className="form-control"
+            value={band.name}
+            onChange={(event) => cambioNombre(event, band.id)}
+            onBlur={() => onPerdioFoco(band.id, band.name)}
+          />
         </td>
         <td>
-          <h3>15</h3>
+          <h3>{band.votes}</h3>
         </td>
         <td>
           <button className="btn btn-danger">Borrar</button>
         </td>
       </tr>
-    );
+    ));
   };
   return (
     <>
