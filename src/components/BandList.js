@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 
-const BandList = ({ data, votar }) => {
+const BandList = ({
+  data,
+  emitirVotarBanda,
+  emitirBorrarBanda,
+  emitirCambioNombre
+}) => {
   //State
   const [bands, setbands] = useState(data);
 
@@ -8,7 +13,7 @@ const BandList = ({ data, votar }) => {
   useEffect(() => setbands(data), [data]);
 
   // Events methods
-  const cambioNombre = (event, id) => {
+  const cambiarNombre = (event, id) => {
     const nuevoNombre = event.target.value;
     setbands((bands) =>
       bands.map((band) => {
@@ -18,14 +23,19 @@ const BandList = ({ data, votar }) => {
     );
   };
 
-  const onPerdioFoco = (id, nombre) => {};
+  const onPerdioFoco = (id, nuevoNombre) => {
+    emitirCambioNombre(id, nuevoNombre);
+  };
 
   //Helper methods
   const crearRows = () => {
     return bands.map((band) => (
       <tr key={band.id}>
         <td>
-          <button className="btn btn-primary" onClick={() => votar(band.id)}>
+          <button
+            className="btn btn-primary"
+            onClick={() => emitirVotarBanda(band.id)}
+          >
             {" "}
             +1
           </button>
@@ -35,7 +45,7 @@ const BandList = ({ data, votar }) => {
             type="text"
             className="form-control"
             value={band.name}
-            onChange={(event) => cambioNombre(event, band.id)}
+            onChange={(event) => cambiarNombre(event, band.id)}
             onBlur={() => onPerdioFoco(band.id, band.name)}
           />
         </td>
@@ -43,7 +53,12 @@ const BandList = ({ data, votar }) => {
           <h3>{band.votes}</h3>
         </td>
         <td>
-          <button className="btn btn-danger">Borrar</button>
+          <button
+            className="btn btn-danger"
+            onClick={() => emitirBorrarBanda(band.id)}
+          >
+            Borrar
+          </button>
         </td>
       </tr>
     ));
